@@ -4,7 +4,7 @@ import NuevoPresupuesto from "./NuevoPresupuesto"
 import ControlPresupuesto from "./ControlPresupuesto"
 
 
-function Header({gastos, presupuesto, setPresupuesto, isValidPresupuesto, setIsValidPresupuesto}) {
+function Header({gastos, setGastos, presupuesto, setPresupuesto, isValidPresupuesto, setIsValidPresupuesto}) {
   return (
     <header>
         <h1>Planificador de gastos</h1>
@@ -12,7 +12,10 @@ function Header({gastos, presupuesto, setPresupuesto, isValidPresupuesto, setIsV
         {isValidPresupuesto ? (
             <ControlPresupuesto
                 gastos = {gastos}
+                setGastos = {setGastos}
                 presupuesto = {presupuesto}
+                setPresupuesto = {setPresupuesto}
+                setIsValidPresupuesto={setIsValidPresupuesto}
             />
         ) : (
             <NuevoPresupuesto
@@ -29,6 +32,7 @@ function Header({gastos, presupuesto, setPresupuesto, isValidPresupuesto, setIsV
 
 Header.propTypes = {
     gastos: Proptypes.array,
+    setGastos: Proptypes.func,
     presupuesto: Proptypes.any,
     setPresupuesto: Proptypes.func,
     isValidPresupuesto: Proptypes.bool,

@@ -1,10 +1,33 @@
 import PropTypes from "prop-types"
-import { useEffect } from "react"
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
+import "react-circular-progressbar/dist/styles.css"
+import { useEffect, useState } from "react"
 
-function ControlPresupuesto({gastos, presupuesto}) {
+function ControlPresupuesto({gastos, presupuesto, setGastos, setPresupuesto, setIsValidPresupuesto}) {
+
+    const [porcentaje, setPorcentaje] = useState(0)
+    const [disponible, setDisponible] = useState(0)
+    const [gastado, setGastado] = useState(0)
 
     useEffect(() =>{
-        console.log("Componente listo")
+        const totalGastado = gastos.reduce( (total, gasto) => {
+            return gasto.cantidad + total
+        },0)
+
+        const totalDisponible = presupuesto - totalGastado
+
+        // Calcular porcentaje gastado
+        const nuevoPorcentaje = (((presupuesto-totalDisponible) / presupuesto) * 100).toFixed(2)
+
+        
+        
+        setDisponible(totalDisponible)
+        setGastado(totalGastado)
+        
+        setTimeout(() =>{
+            setPorcentaje(nuevoPorcentaje)
+        },1000)
+
     }, [gastos])
 
     const formatearCantidad = (cantidad) =>{
@@ -14,23 +37,48 @@ function ControlPresupuesto({gastos, presupuesto}) {
         })
     }
 
+    const handleResetApp = () =>{
+        const resultado = confirm("¿Deseas reiniciar el presupuesto y gastos?")
+
+        if(resultado){
+            setGastos([])
+            setPresupuesto(0)
+            setIsValidPresupuesto(false)
+        }
+    }
+
   return (
     <div className="contenedor-presupuesto contenedor sombra dos-columnas">
         <div>
-            <p>Grafica aqui</p>
+            <CircularProgressbar
+                styles={buildStyles({
+                    pathColor: porcentaje > 100 ? "#DC2626" : '#3B82F6',
+                    trailColor: '#F5F5F5',
+                    textColor: porcentaje > 100 ? "#DC2626" : '#3B82F6'
+                })}
+                value={porcentaje}
+                text={`${porcentaje}% Gastado`}
+            />
         </div>
 
         <div className="contenido-presupuesto">
+            <button 
+                className="reset-app"
+                type="button"
+                onClick={ handleResetApp}
+            >
+                Resetear App
+            </button>
             <p>
                 <span>Presupuesto: </span> {formatearCantidad(presupuesto)}
             </p>
 
-            <p>
-                <span>Disponible: </span> {formatearCantidad(0)}
+            <p className={`${disponible < 0 ? "negativo" : ""}`}>
+                <span>Disponible: </span> {formatearCantidad(disponible)}
             </p>
 
             <p>
-                <span>Gastado: </span> {formatearCantidad(0)}
+                <span>Gastado: </span> {formatearCantidad(gastado)}
             </p>
         </div>
     </div>
@@ -39,7 +87,10 @@ function ControlPresupuesto({gastos, presupuesto}) {
 
 ControlPresupuesto.propTypes = {
     gastos: PropTypes.array,
-    presupuesto: PropTypes.any
+    presupuesto: PropTypes.any,
+    setGastos : PropTypes.func, 
+    setPresupuesto: PropTypes.func, 
+    setIsValidPresupuesto: PropTypes.func
 }
 
 export default ControlPresupuesto
